@@ -5,52 +5,63 @@ import (
 )
 
 type Client struct {
+	ID       uuid.UUID
 	Username string
 }
 
 type Lobby struct {
 	ID      uuid.UUID
-	Clients []*Client
+	Clients map[uuid.UUID]*Client
+	HostID  uuid.UUID
 	Chat    *ChatRoom
 }
 
 var LobbyMaxClientCapacity int = 8
 
 // functions
-func CreateLobby(ID uuid.UUID, hostUsername string) *Lobby {
+func CreateLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
 	if hostUsername == "" {
 		// TODO: handle error
 		return nil
 	}
 
 	newLobby := &Lobby{
-		ID:      ID,
-		Clients: make([]*Client, LobbyMaxClientCapacity),
+		ID:      lobbyID,
+		Clients: make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
 	}
 
-	host := &Client{Username: hostUsername}
+	host := &Client{ID: hostID, Username: hostUsername}
 
-	newLobby.Clients[0] = host
+	newLobby.Clients[hostID] = host
+	newLobby.HostID = hostID
 
 	return newLobby
 }
 
-func (lobby *Lobby) AddClient(username string) {
-	if username == "" {
-		//TODO: handle error
+func (lobby *Lobby) ClientConnect(clientID uuid.UUID, clientUsername string) {
+	if clientUsername == "" {
+		//TODO: handle error invalid username
 		return
 	}
 	if len(lobby.Clients) == LobbyMaxClientCapacity {
-		//TODO: handle error
+		//TODO: handle error lobby is full
+		return
+	}
+	if _, err := lobby.Clients[clientID]; !err {
+		//TODO: handle error client has already joined
 		return
 	}
 
-	newClient := &Client{Username: username}
+	newClient := &Client{ID: clientID, Username: clientUsername}
 
-	for slot, client := range lobby.Clients {
-		if client == nil {
-			lobby.Clients[slot] = newClient
-			break
-		}
+	lobby.Clients[clientID] = newClient
+}
+
+func (lobby *Lobby) ClientDisconnect(clientID uuid.UUID) {
+	if _, err := lobby.Clients[clientID]; err {
+		//TODO: handle error client is not in lobby
+		return
 	}
+
+	lobby.Clients[clientID] = nil
 }
