@@ -3,7 +3,7 @@ package frontend
 import "embed"
 
 //go:embed templates/*.html
-var Tempates embed.FS
+var Templates embed.FS
 
 //go:embed static/*
 var Static embed.FS

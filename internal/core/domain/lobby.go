@@ -19,7 +19,7 @@ type Lobby struct {
 var LobbyMaxClientCapacity int = 8
 
 // functions
-func CreateLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
+func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
 	if hostUsername == "" {
 		// TODO: handle error
 		return nil
@@ -28,12 +28,11 @@ func CreateLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobb
 	newLobby := &Lobby{
 		ID:      lobbyID,
 		Clients: make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
+		HostID:  hostID,
+		Chat:    NewChatRoom(),
 	}
 
-	host := &Client{ID: hostID, Username: hostUsername}
-
-	newLobby.Clients[hostID] = host
-	newLobby.HostID = hostID
+	newLobby.ClientConnect(hostID, hostUsername)
 
 	return newLobby
 }

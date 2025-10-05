@@ -11,3 +11,7 @@ type Message struct {
 type ChatRoom struct {
 	Messages []*Message
 }
+
+func NewChatRoom() *ChatRoom {
+	return &ChatRoom{}
+}
