@@ -54,6 +54,8 @@ func (lobby *Lobby) ClientConnect(clientID uuid.UUID, clientUsername string) {
 	newClient := &Client{ID: clientID, Username: clientUsername}
 
 	lobby.Clients[clientID] = newClient
+
+	//TODO: send message on the chat e.g. "User {username} connected."
 }
 
 func (lobby *Lobby) ClientDisconnect(clientID uuid.UUID) {
