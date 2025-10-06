@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -22,6 +24,7 @@ var LobbyMaxClientCapacity int = 8
 func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
 	if hostUsername == "" {
 		// TODO: handle error
+		fmt.Println("host username is empty")
 		return nil
 	}
 

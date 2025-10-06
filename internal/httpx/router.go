@@ -22,7 +22,8 @@ func NewRouter() *mux.Router {
 
 	// routes
 	router.HandleFunc("/", handlers.HomePage)
-	router.HandleFunc("/lobby", handlers.LobbyPage)
+	router.HandleFunc("/lobby", handlers.CreateOrJoinLobbyPage).Methods("POST")
+	router.HandleFunc("/lobby/{id}", handlers.LobbyPage)
 
 	return router
 }
