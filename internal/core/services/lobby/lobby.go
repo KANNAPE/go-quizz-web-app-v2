@@ -11,9 +11,10 @@ var Lobbies map[uuid.UUID]*domain.Lobby = make(map[uuid.UUID]*domain.Lobby)
 
 func GenerateNewLobby(username string) *domain.Lobby {
 	newLobbyID := uuid.New()
-	if lobb, ok := Lobbies[newLobbyID]; ok {
+	if _, ok := Lobbies[newLobbyID]; ok {
 		//TODO: handle error, lobby ID already exists
-		fmt.Printf("lobby %v ID %v already exists!\n", lobb, newLobbyID)
+		fmt.Println("lobby already exists!")
+
 		return nil
 	}
 
