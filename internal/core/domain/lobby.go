@@ -49,7 +49,7 @@ func (lobby *Lobby) ClientConnect(clientID uuid.UUID, clientUsername string) {
 		//TODO: handle error lobby is full
 		return
 	}
-	if _, err := lobby.Clients[clientID]; !err {
+	if _, ok := lobby.Clients[clientID]; ok {
 		//TODO: handle error client has already joined
 		return
 	}

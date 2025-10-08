@@ -6,7 +6,7 @@ import (
 	"text/template"
 )
 
-func HomePage(writer http.ResponseWriter, request *http.Request) {
+func (handler *Handler) HomePage(writer http.ResponseWriter, request *http.Request) {
 	homePageTemplate, err := template.ParseFS(frontend.Templates, "templates/layout.html", "templates/index.html")
 	if err != nil {
 		http.Error(writer, "template error", http.StatusInternalServerError)

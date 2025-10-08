@@ -16,7 +16,7 @@ type test struct {
 
 var Test test
 
-func CreateOrJoinLobbyPage(writer http.ResponseWriter, request *http.Request) {
+func (handler *Handler) CreateOrJoinLobbyPage(writer http.ResponseWriter, request *http.Request) {
 	if err := request.ParseForm(); err != nil {
 		http.Error(writer, "form parsing failed", http.StatusBadRequest)
 		return
@@ -36,21 +36,22 @@ func CreateOrJoinLobbyPage(writer http.ResponseWriter, request *http.Request) {
 	if request.TLS != nil {
 		scheme = "https"
 	}
-	joinUrl := fmt.Sprintf("%v://%v%v/%v", scheme, request.Host, request.RequestURI, newLobby.ID)
 
-	Test = test{JoinURL: joinUrl, LobbyID: newLobby.ID.String(), Username: username}
+	handler.JoinURL = fmt.Sprintf("%v://%v%v/%v", scheme, request.Host, request.RequestURI, newLobby.ID)
+	handler.Lobby.FromLobby(newLobby)
+	handler.Host.FromClient(newLobby.Clients[newLobby.HostID])
 
 	http.Redirect(writer, request, lobbyUrl, http.StatusSeeOther)
 }
 
-func LobbyPage(writer http.ResponseWriter, request *http.Request) {
+func (handler *Handler) LobbyPage(writer http.ResponseWriter, request *http.Request) {
 	lobbyPageTemplate, err := template.ParseFS(frontend.Templates, "templates/layout.html", "templates/lobby.html")
 	if err != nil {
 		http.Error(writer, "template error", http.StatusInternalServerError)
 		return
 	}
 
-	err = lobbyPageTemplate.Execute(writer, Test)
+	err = lobbyPageTemplate.Execute(writer, handler)
 	if err != nil {
 		http.Error(writer, "render error", http.StatusInternalServerError)
 	}

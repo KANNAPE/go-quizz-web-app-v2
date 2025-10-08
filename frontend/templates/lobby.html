@@ -1,8 +1,8 @@
 {{ define "title" }}App · Lobby{{ end }}
 
 {{ define "content" }}
-<h1>Welcome, {{ .Username }}!</h1>
-<code>{{ .LobbyID }}</code>
+<h1>Welcome, {{ .Host.Username }}!</h1>
+<code>{{ .Lobby.ID }}</code>
 <br>
 <p>Copy this link to invite friends:</p>
 <p>{{ .JoinURL }}</p>

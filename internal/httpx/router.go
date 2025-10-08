@@ -20,10 +20,12 @@ func NewRouter() *mux.Router {
 	fileServer := http.FileServer(http.FS(staticSub))
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static/", fileServer))
 
+	handler := handlers.NewHandler()
+
 	// routes
-	router.HandleFunc("/", handlers.HomePage)
-	router.HandleFunc("/lobby", handlers.CreateOrJoinLobbyPage).Methods("POST")
-	router.HandleFunc("/lobby/{id}", handlers.LobbyPage)
+	router.HandleFunc("/", handler.HomePage)
+	router.HandleFunc("/lobby", handler.CreateOrJoinLobbyPage).Methods("POST")
+	router.HandleFunc("/lobby/{id}", handler.LobbyPage)
 
 	return router
 }
