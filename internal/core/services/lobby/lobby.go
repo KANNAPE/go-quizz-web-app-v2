@@ -9,13 +9,13 @@ import (
 
 var Lobbies map[uuid.UUID]*domain.Lobby = make(map[uuid.UUID]*domain.Lobby)
 
-func GenerateNewLobby(username string) *domain.Lobby {
+func GenerateNewLobby(username string) string {
 	newLobbyID := uuid.New()
 	if _, ok := Lobbies[newLobbyID]; ok {
 		//TODO: handle error, lobby ID already exists
 		fmt.Println("lobby already exists!")
 
-		return nil
+		return ""
 	}
 
 	userID := uuid.New() // not important to check for duplicates when creating a lobby since its users array will be empty
@@ -25,5 +25,5 @@ func GenerateNewLobby(username string) *domain.Lobby {
 		Lobbies[newLobbyID] = newLobby
 	}
 
-	return newLobby
+	return "/api/lobby/" + newLobbyID.String()
 }

@@ -11,4 +11,6 @@ func main() {
 
 	fmt.Println("Listening on localhost:8080...")
 	http.ListenAndServe(":8080", router)
+
+	// https://github.com/TutorialEdge/go-rest-api-course
 }

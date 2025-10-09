@@ -1,9 +1,7 @@
 package httpx
 
 import (
-	"go-quizz/m/frontend"
-	"go-quizz/m/internal/httpx/handlers"
-	"io/fs"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,20 +10,14 @@ import (
 func NewRouter() *mux.Router {
 	router := mux.NewRouter()
 
-	staticSub, err := fs.Sub(frontend.Static, "static")
-	if err != nil {
-		return nil
-	}
-
-	fileServer := http.FileServer(http.FS(staticSub))
-	router.PathPrefix("/static").Handler(http.StripPrefix("/static/", fileServer))
-
-	handler := handlers.NewHandler()
+	//handler := transport.NewHandler()
 
 	// routes
-	router.HandleFunc("/", handler.HomePage)
-	router.HandleFunc("/lobby", handler.CreateOrJoinLobbyPage).Methods("POST")
-	router.HandleFunc("/lobby/{id}", handler.LobbyPage)
+	router.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
+		fmt.Fprint(writer, "API Endpoint Hit")
+	})
+	// router.HandleFunc("/api/lobby", ).Methods("POST")
+	// router.HandleFunc("/api/lobby/{id}", handler.LobbyPage)
 
 	return router
 }

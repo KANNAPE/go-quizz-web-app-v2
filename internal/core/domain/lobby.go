@@ -6,16 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type Client struct {
-	ID       uuid.UUID
-	Username string
-}
-
 type Lobby struct {
-	ID      uuid.UUID
-	Clients map[uuid.UUID]*Client
-	HostID  uuid.UUID
-	Chat    *ChatRoom
+	ID       uuid.UUID              `json:"id"`
+	Clients  map[uuid.UUID]*Client  `json:"clients"`
+	HostID   uuid.UUID              `json:"host_id"`
+	Messages map[uuid.UUID]*Message `json:"chat"`
 }
 
 var LobbyMaxClientCapacity int = 8
@@ -29,10 +24,10 @@ func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
 	}
 
 	newLobby := &Lobby{
-		ID:      lobbyID,
-		Clients: make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
-		HostID:  hostID,
-		Chat:    NewChatRoom(),
+		ID:       lobbyID,
+		Clients:  make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
+		HostID:   hostID,
+		Messages: make(map[uuid.UUID]*Message, 0),
 	}
 
 	newLobby.ClientConnect(hostID, hostUsername)
@@ -57,15 +52,13 @@ func (lobby *Lobby) ClientConnect(clientID uuid.UUID, clientUsername string) {
 	newClient := &Client{ID: clientID, Username: clientUsername}
 
 	lobby.Clients[clientID] = newClient
-
-	//TODO: send message on the chat e.g. "User {username} connected."
 }
 
 func (lobby *Lobby) ClientDisconnect(clientID uuid.UUID) {
-	if _, err := lobby.Clients[clientID]; err {
+	if _, ok := lobby.Clients[clientID]; !ok {
 		//TODO: handle error client is not in lobby
 		return
 	}
 
-	lobby.Clients[clientID] = nil
+	delete(lobby.Clients, clientID)
 }
