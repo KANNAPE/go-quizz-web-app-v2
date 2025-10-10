@@ -8,31 +8,19 @@ import (
 
 type Lobby struct {
 	ID       uuid.UUID              `json:"id"`
-	Clients  map[uuid.UUID]*Client  `json:"clients"`
 	HostID   uuid.UUID              `json:"host_id"`
+	Clients  map[uuid.UUID]*Client  `json:"clients"`
 	Messages map[uuid.UUID]*Message `json:"chat"`
 }
 
 var LobbyMaxClientCapacity int = 8
 
 // functions
-func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) (*Lobby, error) {
-	if hostUsername == "" {
-		// TODO: handle error
-		return nil, errors.New("host username is empty")
+func NewLobby(lobbyID uuid.UUID) *Lobby {
+	return &Lobby{
+		ID:      lobbyID,
+		Clients: make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
 	}
-
-	newLobby := &Lobby{
-		ID:       lobbyID,
-		Clients:  make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
-		HostID:   hostID,
-		Messages: make(map[uuid.UUID]*Message, 0),
-	}
-
-	if err := newLobby.ClientConnects(hostID, hostUsername); err != nil {
-		return nil, errors.New("could not connect client")
-	}
-	return newLobby, nil
 }
 
 func (lobby *Lobby) ClientConnects(clientID uuid.UUID, clientUsername string) error {

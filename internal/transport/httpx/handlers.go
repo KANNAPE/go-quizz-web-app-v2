@@ -1,9 +1,7 @@
 package httpx
 
 import (
-	"fmt"
 	"go-quizz/m/internal/core/services/lobby"
-	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -15,15 +13,18 @@ type Handler struct {
 
 func NewHandler(lobby *lobby.LobbyService) *Handler {
 	handler := &Handler{
-		Lobby: lobby,
+		Lobby:  lobby,
+		Router: mux.NewRouter(),
 	}
 
-	handler.Router = mux.NewRouter()
-
 	// routes
-	handler.Router.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
-		fmt.Fprint(writer, "API Endpoint Hit")
-	})
+	handler.MapRoutes()
 
 	return handler
+}
+
+func (h *Handler) MapRoutes() {
+	h.Router.HandleFunc("/api/lobbies", h.GetLobbies).Methods("GET")
+	h.Router.HandleFunc("/api/lobby", h.PostLobby).Methods("POST")
+	h.Router.HandleFunc("/api/lobby/{id}", h.GetLobby).Methods("GET")
 }
