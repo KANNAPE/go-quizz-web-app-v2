@@ -54,3 +54,127 @@ func (h *Handler) PostLobby(writer http.ResponseWriter, req *http.Request) {
 		writer.WriteHeader(http.StatusInternalServerError)
 	}
 }
+
+func (h *Handler) GetLobbyClients(writer http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+
+	lobby_id := vars["id"]
+	if lobby_id == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lobbyID, err := uuid.Parse(lobby_id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lobby, err := h.Lobby.Get(lobbyID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(writer).Encode(lobby.Clients); err != nil {
+		panic(err)
+	}
+}
+
+func (h *Handler) LobbyClientConnects(writer http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+
+	lobby_id := vars["lobby_id"]
+	if lobby_id == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lobbyID, err := uuid.Parse(lobby_id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lobby, err := h.Lobby.Get(lobbyID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	client_id := vars["client_id"]
+	if client_id == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	clientID, err := uuid.Parse(client_id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	client, err := h.Client.Get(clientID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Lobby.ConnectsClient(lobbyID, client); err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(writer).Encode(lobby); err != nil {
+		panic(err)
+	}
+}
+
+func (h *Handler) LobbyClientDisconnects(writer http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+
+	lobby_id := vars["lobby_id"]
+	if lobby_id == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lobbyID, err := uuid.Parse(lobby_id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lobby, err := h.Lobby.Get(lobbyID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	client_id := vars["client_id"]
+	if client_id == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	clientID, err := uuid.Parse(client_id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	client, err := h.Client.Get(clientID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Lobby.DisconnectsClient(lobbyID, client); err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(writer).Encode(lobby); err != nil {
+		panic(err)
+	}
+}
