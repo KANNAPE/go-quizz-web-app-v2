@@ -12,3 +12,12 @@ type Message struct {
 	TimeSent time.Time `json:"time_sent"`
 	Body     string    `json:"content"`
 }
+
+func NewMessage(id uuid.UUID, sender *Client, timeSent time.Time, body string) *Message {
+	return &Message{
+		ID:       id,
+		Sender:   sender,
+		TimeSent: timeSent,
+		Body:     body,
+	}
+}

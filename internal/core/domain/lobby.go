@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/google/uuid"
 )
@@ -16,11 +16,10 @@ type Lobby struct {
 var LobbyMaxClientCapacity int = 8
 
 // functions
-func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
+func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) (*Lobby, error) {
 	if hostUsername == "" {
 		// TODO: handle error
-		fmt.Println("host username is empty")
-		return nil
+		return nil, errors.New("host username is empty")
 	}
 
 	newLobby := &Lobby{
@@ -30,35 +29,44 @@ func NewLobby(lobbyID uuid.UUID, hostID uuid.UUID, hostUsername string) *Lobby {
 		Messages: make(map[uuid.UUID]*Message, 0),
 	}
 
-	newLobby.ClientConnect(hostID, hostUsername)
-
-	return newLobby
+	if err := newLobby.ClientConnects(hostID, hostUsername); err != nil {
+		return nil, errors.New("could not connect client")
+	}
+	return newLobby, nil
 }
 
-func (lobby *Lobby) ClientConnect(clientID uuid.UUID, clientUsername string) {
+func (lobby *Lobby) ClientConnects(clientID uuid.UUID, clientUsername string) error {
 	if clientUsername == "" {
-		//TODO: handle error invalid username
-		return
+		//TODO: handle error
+		return errors.New("invalid username")
 	}
 	if len(lobby.Clients) == LobbyMaxClientCapacity {
-		//TODO: handle error lobby is full
-		return
+		//TODO: handle error
+		return errors.New("lobby is full")
 	}
 	if _, ok := lobby.Clients[clientID]; ok {
-		//TODO: handle error client has already joined
-		return
+		//TODO: handle error
+		return errors.New("client has already joined")
 	}
 
-	newClient := &Client{ID: clientID, Username: clientUsername}
+	newClient := NewClient(clientID, clientUsername)
 
 	lobby.Clients[clientID] = newClient
+
+	return nil
 }
 
-func (lobby *Lobby) ClientDisconnect(clientID uuid.UUID) {
+func (lobby *Lobby) ClientDisconnects(clientID uuid.UUID) error {
 	if _, ok := lobby.Clients[clientID]; !ok {
-		//TODO: handle error client is not in lobby
-		return
+		//TODO: handle error
+		return errors.New("client is not in lobby")
 	}
 
 	delete(lobby.Clients, clientID)
+
+	return nil
+}
+
+func (lobby *Lobby) ClientSendsMessage(clientID uuid.UUID, messageBody string) error {
+	return nil
 }

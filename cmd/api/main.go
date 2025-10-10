@@ -2,15 +2,19 @@ package main
 
 import (
 	"fmt"
-	"go-quizz/m/internal/httpx"
 	"net/http"
+
+	"go-quizz/m/internal/core/services/lobby"
+	"go-quizz/m/internal/transport/httpx"
 )
 
 func main() {
-	router := httpx.NewRouter()
+	lobbySrvc := lobby.NewService()
+
+	handler := httpx.NewHandler(lobbySrvc)
 
 	fmt.Println("Listening on localhost:8080...")
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":8080", handler.Router)
 
 	// https://github.com/TutorialEdge/go-rest-api-course
 }

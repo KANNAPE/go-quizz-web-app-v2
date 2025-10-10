@@ -7,11 +7,17 @@ import (
 	"github.com/google/uuid"
 )
 
-var Lobbies map[uuid.UUID]*domain.Lobby = make(map[uuid.UUID]*domain.Lobby)
+type LobbyService struct {
+	lobbies map[uuid.UUID]*domain.Lobby
+}
 
-func GenerateNewLobby(username string) string {
+func NewService() *LobbyService {
+	return &LobbyService{}
+}
+
+func (lobbySrvc *LobbyService) Generate(username string) string {
 	newLobbyID := uuid.New()
-	if _, ok := Lobbies[newLobbyID]; ok {
+	if _, ok := lobbySrvc.lobbies[newLobbyID]; ok {
 		//TODO: handle error, lobby ID already exists
 		fmt.Println("lobby already exists!")
 
@@ -20,9 +26,8 @@ func GenerateNewLobby(username string) string {
 
 	userID := uuid.New() // not important to check for duplicates when creating a lobby since its users array will be empty
 
-	newLobby := domain.NewLobby(newLobbyID, userID, username)
-	if newLobby != nil {
-		Lobbies[newLobbyID] = newLobby
+	if newLobby, error := domain.NewLobby(newLobbyID, userID, username); error != nil {
+		lobbySrvc.lobbies[newLobbyID] = newLobby
 	}
 
 	return "/api/lobby/" + newLobbyID.String()
