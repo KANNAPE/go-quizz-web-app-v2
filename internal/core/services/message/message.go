@@ -19,13 +19,7 @@ func NewService() *Service {
 	}
 }
 
-func (messageSrvc *Service) Create(sender *domain.Client, body string) (uuid.UUID, error) {
-	if sender == nil {
-		return uuid.Nil, errors.New("client doesn't exist")
-	}
-	if false {
-		//
-	}
+func (messageSrvc *Service) Create(body string) (uuid.UUID, error) {
 	if strings.Trim(body, "") == "" {
 		return uuid.Nil, errors.New("can't send an empty message")
 	}
@@ -37,7 +31,7 @@ func (messageSrvc *Service) Create(sender *domain.Client, body string) (uuid.UUI
 
 	timeSent := time.Now()
 
-	messageSrvc.messages[newMessageID] = domain.NewMessage(newMessageID, sender, timeSent, body)
+	messageSrvc.messages[newMessageID] = domain.NewMessage(newMessageID, timeSent, body)
 
 	return newMessageID, nil
 }

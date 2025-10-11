@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) GetLobbies(writer http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetAllLobbies(writer http.ResponseWriter, req *http.Request) {
 	lobbies := h.Lobby.GetAll()
 
 	if len(lobbies) == 0 {
