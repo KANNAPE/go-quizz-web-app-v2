@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h *Handler) GetClients(writer http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetAllClients(writer http.ResponseWriter, req *http.Request) {
 	clients := h.Client.GetAll()
 
 	if len(clients) == 0 {

@@ -3,9 +3,6 @@ package httpx
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 )
 
 func (h *Handler) GetLobbies(writer http.ResponseWriter, req *http.Request) {
@@ -22,15 +19,7 @@ func (h *Handler) GetLobbies(writer http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) GetLobby(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-
-	lobby_id := vars["id"]
-	if lobby_id == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	lobbyID, err := uuid.Parse(lobby_id)
+	lobbyID, err := getUUIDFromUri(req, "id")
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
@@ -56,19 +45,7 @@ func (h *Handler) PostLobby(writer http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) GetLobbyClients(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-
-	lobby_id := vars["id"]
-	if lobby_id == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	lobbyID, err := uuid.Parse(lobby_id)
-	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	lobbyID, err := getUUIDFromUri(req, "id")
 
 	lobby, err := h.Lobby.Get(lobbyID)
 	if err != nil {
@@ -82,15 +59,7 @@ func (h *Handler) GetLobbyClients(writer http.ResponseWriter, req *http.Request)
 }
 
 func (h *Handler) LobbyClientConnects(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-
-	lobby_id := vars["lobby_id"]
-	if lobby_id == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	lobbyID, err := uuid.Parse(lobby_id)
+	lobbyID, err := getUUIDFromUri(req, "lobby_id")
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
@@ -102,13 +71,7 @@ func (h *Handler) LobbyClientConnects(writer http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	client_id := vars["client_id"]
-	if client_id == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	clientID, err := uuid.Parse(client_id)
+	clientID, err := getUUIDFromUri(req, "client_id")
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
@@ -131,15 +94,7 @@ func (h *Handler) LobbyClientConnects(writer http.ResponseWriter, req *http.Requ
 }
 
 func (h *Handler) LobbyClientDisconnects(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-
-	lobby_id := vars["lobby_id"]
-	if lobby_id == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	lobbyID, err := uuid.Parse(lobby_id)
+	lobbyID, err := getUUIDFromUri(req, "lobby_id")
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
@@ -151,13 +106,7 @@ func (h *Handler) LobbyClientDisconnects(writer http.ResponseWriter, req *http.R
 		return
 	}
 
-	client_id := vars["client_id"]
-	if client_id == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	clientID, err := uuid.Parse(client_id)
+	clientID, err := getUUIDFromUri(req, "client_id")
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
