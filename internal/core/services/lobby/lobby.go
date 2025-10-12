@@ -18,10 +18,10 @@ func NewService() *Service {
 	}
 }
 
-func (lobbySrvc *Service) Generate() uuid.UUID {
+func (srvc *Service) OpenLobby() uuid.UUID {
 	newLobbyID := uuid.New()
-	if _, ok := lobbySrvc.lobbies[newLobbyID]; !ok {
-		lobbySrvc.lobbies[newLobbyID] = domain.NewLobby(newLobbyID)
+	if _, ok := srvc.lobbies[newLobbyID]; !ok {
+		srvc.lobbies[newLobbyID] = domain.NewLobby(newLobbyID)
 	} else {
 		//TODO: handle error, lobby ID already exists
 		fmt.Println("lobby already exists!")
@@ -30,10 +30,10 @@ func (lobbySrvc *Service) Generate() uuid.UUID {
 	return newLobbyID
 }
 
-func (lobbySrvc *Service) GetAll() []domain.Lobby {
+func (srvc *Service) GetAllLobbies() []domain.Lobby {
 	var lobbies []domain.Lobby
 
-	for _, lobby := range lobbySrvc.lobbies {
+	for _, lobby := range srvc.lobbies {
 		lobbyCopy := domain.Lobby{
 			ID:       lobby.ID,
 			HostID:   lobby.HostID,
@@ -47,64 +47,28 @@ func (lobbySrvc *Service) GetAll() []domain.Lobby {
 	return lobbies
 }
 
-func (lobbySrvc *Service) Get(lobbyID uuid.UUID) (domain.Lobby, error) {
-	if _, ok := lobbySrvc.lobbies[lobbyID]; !ok {
-		return domain.Lobby{}, errors.New("Lobby doesn't exists!")
+func (srvc *Service) GetLobby(lobbyID uuid.UUID) (domain.Lobby, error) {
+	if _, ok := srvc.lobbies[lobbyID]; !ok {
+		return domain.Lobby{}, errors.New("Lobby doesn't exist!")
 	}
 
-	return *lobbySrvc.lobbies[lobbyID], nil
+	return *srvc.lobbies[lobbyID], nil
 }
 
-func (lobbySrvc *Service) GetClients(lobbyID uuid.UUID) ([]domain.Client, error) {
-	if _, ok := lobbySrvc.lobbies[lobbyID]; !ok {
-		return nil, errors.New("Lobby doesn't exists!")
+func (srvc *Service) CloseLobby(lobbyID uuid.UUID) error {
+	lobby, ok := srvc.lobbies[lobbyID]
+	if !ok {
+		return errors.New("lobby doesn't exist!")
 	}
 
-	lobby := lobbySrvc.lobbies[lobbyID]
-
-	var clients []domain.Client
-	for _, client := range lobby.Clients {
-		clientCopy := domain.Client{
-			ID:       client.ID,
-			Username: client.Username,
-		}
-
-		clients = append(clients, clientCopy)
+	for clientID := range lobby.Clients {
+		delete(lobby.Clients, clientID)
+	}
+	for messageID := range lobby.Messages {
+		delete(lobby.Messages, messageID)
 	}
 
-	return clients, nil
-}
+	delete(srvc.lobbies, lobbyID)
 
-func (lobbySrvc *Service) ConnectsClient(lobbyID uuid.UUID, client domain.Client) error {
-	if lobby, ok := lobbySrvc.lobbies[lobbyID]; !ok {
-		return errors.New("lobby doesn't exists")
-	} else if len(lobby.Clients) == domain.LobbyMaxClientCapacity {
-		return errors.New("lobby is already full")
-	} else if _, ok := lobby.Clients[client.ID]; ok {
-		return errors.New("client already in lobby")
-	} else {
-		lobby.Clients[client.ID] = &client
-
-		if len(lobby.Clients) == 1 {
-			lobby.HostID = client.ID
-		}
-		return nil
-	}
-}
-
-func (lobbySrvc *Service) DisconnectsClient(lobbyID uuid.UUID, client domain.Client) error {
-	if lobby, ok := lobbySrvc.lobbies[lobbyID]; !ok {
-		return errors.New("lobby doesn't exists")
-	} else if len(lobby.Clients) == 0 {
-		return errors.New("lobby is already empty")
-	} else if _, ok := lobby.Clients[client.ID]; !ok {
-		return errors.New("client is not in lobby")
-	} else {
-		delete(lobby.Clients, client.ID)
-
-		if lobby.HostID == client.ID {
-			// TODO
-		}
-		return nil
-	}
+	return nil
 }

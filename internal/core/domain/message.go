@@ -8,7 +8,7 @@ import (
 
 type Message struct {
 	ID       uuid.UUID `json:"id"`
-	Sender   *Client   `json:"sender"`
+	Sender   uuid.UUID `json:"sender"`
 	TimeSent time.Time `json:"time_sent"`
 	Body     string    `json:"content"`
 }

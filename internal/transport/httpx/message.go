@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) GetAllMessages(writer http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetLobbyMessages(writer http.ResponseWriter, req *http.Request) {
 	messages := h.Message.GetAll()
 
 	if err := json.NewEncoder(writer).Encode(messages); err != nil {

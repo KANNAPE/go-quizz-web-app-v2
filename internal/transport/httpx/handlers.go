@@ -2,9 +2,7 @@ package httpx
 
 import (
 	"errors"
-	"go-quizz/m/internal/core/services/client"
-	"go-quizz/m/internal/core/services/lobby"
-	"go-quizz/m/internal/core/services/message"
+	service "go-quizz/m/internal/core/service/lobby"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -12,18 +10,14 @@ import (
 )
 
 type Handler struct {
-	Router  *mux.Router
-	Lobby   *lobby.Service
-	Client  *client.Service
-	Message *message.Service
+	Router *mux.Router
+	Lobby  *service.Lobby
 }
 
-func NewHandler(lobby *lobby.Service, client *client.Service, message *message.Service) *Handler {
+func NewHandler(lobby *service.Lobby) *Handler {
 	handler := &Handler{
-		Router:  mux.NewRouter(),
-		Lobby:   lobby,
-		Client:  client,
-		Message: message,
+		Router: mux.NewRouter(),
+		Lobby:  lobby,
 	}
 
 	// routes
@@ -36,20 +30,18 @@ func (h *Handler) MapRoutes() {
 	// Lobby
 	h.Router.HandleFunc("/api/lobbies", h.GetAllLobbies).Methods("GET")
 	h.Router.HandleFunc("/api/lobby", h.PostLobby).Methods("POST")
-	h.Router.HandleFunc("/api/lobby/{id}", h.GetLobby).Methods("GET")
-	h.Router.HandleFunc("/api/lobby/{id}/clients", h.GetLobbyClients).Methods("GET")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/connect/{client_id}", h.LobbyClientConnects).Methods("PATCH")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/disconnect/{client_id}", h.LobbyClientDisconnects).Methods("PATCH")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}", h.GetLobby).Methods("GET")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}", h.DeleteLobby).Methods("DELETE")
 
 	// Client
-	h.Router.HandleFunc("/api/clients", h.GetAllClients).Methods("GET")
-	h.Router.HandleFunc("/api/client", h.PostClient).Methods("POST")
-	h.Router.HandleFunc("/api/client/{id}", h.GetClient).Methods("GET")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}/clients", h.GetLobbyClients).Methods("GET")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}/connect", h.LobbyClientConnects).Methods("POST")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}/disconnect/{client_id}", h.LobbyClientDisconnects).Methods("DELETE")
 
 	// Message
-	h.Router.HandleFunc("/api/messages", h.GetAllMessages).Methods("GET")
-	h.Router.HandleFunc("/api/message", h.PostMessage).Methods("POST")
-	h.Router.HandleFunc("/api/message/{id}", h.GetMessage).Methods("GET")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}/messages", h.GetLobbyMessages).Methods("GET")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}/message", h.PostMessage).Methods("POST")
+	h.Router.HandleFunc("/api/lobby/{lobby_id}/message/{message_id}", h.GetMessage).Methods("GET")
 }
 
 func getUUIDFromUri(req *http.Request, uriID string) (uuid.UUID, error) {
