@@ -2,7 +2,7 @@ package httpx
 
 import (
 	"errors"
-	service "go-quizz/m/internal/core/service/lobby"
+	"go-quizz/m/internal/core/services/lobby"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -11,10 +11,10 @@ import (
 
 type Handler struct {
 	Router *mux.Router
-	Lobby  *service.Lobby
+	Lobby  *lobby.LobbyService
 }
 
-func NewHandler(lobby *service.Lobby) *Handler {
+func NewHandler(lobby *lobby.LobbyService) *Handler {
 	handler := &Handler{
 		Router: mux.NewRouter(),
 		Lobby:  lobby,

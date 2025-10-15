@@ -58,28 +58,19 @@ func (h *Handler) LobbyClientDisconnects(writer http.ResponseWriter, req *http.R
 		return
 	}
 
-	lobby, err := h.Lobby.Get(lobbyID)
-	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
 	clientID, err := getUUIDFromUri(req, "client_id")
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	client, err := h.Client.Get(clientID)
+	client, err := h.Lobby.GetClientInLobby(lobbyID, clientID)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if err := h.Lobby.DisconnectsClient(lobbyID, client); err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	lobby, _ := h.Lobby.DisconnectsClient(lobbyID, client)
 
 	if err := json.NewEncoder(writer).Encode(lobby); err != nil {
 		panic(err)

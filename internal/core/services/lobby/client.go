@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (srvc *Service) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client, error) {
+func (srvc *LobbyService) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client, error) {
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
 		return nil, errors.New("Lobby doesn't exists!")
 	}
@@ -28,7 +28,27 @@ func (srvc *Service) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client, erro
 	return clients, nil
 }
 
-func (srvc *Service) ConnectsClient(lobbyID uuid.UUID, username string) (domain.Lobby, error) {
+func (srvc *LobbyService) GetClientInLobby(lobbyID uuid.UUID, clientID uuid.UUID) (domain.Client, error) {
+	if _, ok := srvc.lobbies[lobbyID]; !ok {
+		return domain.Client{}, errors.New("Lobby doesn't exists!")
+	}
+
+	lobby := srvc.lobbies[lobbyID]
+
+	client, ok := lobby.Clients[clientID]
+	if !ok {
+		return domain.Client{}, errors.New("client is not in lobby")
+	}
+
+	clientCopy := domain.Client{
+		ID:       client.ID,
+		Username: client.Username,
+	}
+
+	return clientCopy, nil
+}
+
+func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (domain.Lobby, error) {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return domain.Lobby{}, errors.New("lobby doesn't exists")
@@ -52,7 +72,7 @@ func (srvc *Service) ConnectsClient(lobbyID uuid.UUID, username string) (domain.
 	return *lobby, nil
 }
 
-func (srvc *Service) DisconnectsClient(lobbyID uuid.UUID, client domain.Client) (domain.Lobby, error) {
+func (srvc *LobbyService) DisconnectsClient(lobbyID uuid.UUID, client domain.Client) (domain.Lobby, error) {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return domain.Lobby{}, errors.New("lobby doesn't exists")

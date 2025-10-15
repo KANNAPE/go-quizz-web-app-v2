@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	service "go-quizz/m/internal/core/service/lobby"
+	"go-quizz/m/internal/core/services/lobby"
 	"go-quizz/m/internal/transport/httpx"
 )
 
 func main() {
-	lobbySrvc := service.NewLobbyService()
+	lobbySrvc := lobby.NewService()
 
 	handler := httpx.NewHandler(lobbySrvc)
 

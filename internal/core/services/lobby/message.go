@@ -1,3 +1,5 @@
 package lobby
 
-func (srvc *Service) PostMessage()
+func (srvc *LobbyService) PostMessage() {
+
+}

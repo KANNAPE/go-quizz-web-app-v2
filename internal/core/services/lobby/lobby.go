@@ -8,17 +8,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type Service struct {
+type LobbyService struct {
 	lobbies map[uuid.UUID]*domain.Lobby
 }
 
-func NewService() *Service {
-	return &Service{
+func NewService() *LobbyService {
+	return &LobbyService{
 		lobbies: make(map[uuid.UUID]*domain.Lobby),
 	}
 }
 
-func (srvc *Service) OpenLobby() uuid.UUID {
+func (srvc *LobbyService) OpenLobby() uuid.UUID {
 	newLobbyID := uuid.New()
 	if _, ok := srvc.lobbies[newLobbyID]; !ok {
 		srvc.lobbies[newLobbyID] = domain.NewLobby(newLobbyID)
@@ -30,7 +30,7 @@ func (srvc *Service) OpenLobby() uuid.UUID {
 	return newLobbyID
 }
 
-func (srvc *Service) GetAllLobbies() []domain.Lobby {
+func (srvc *LobbyService) GetAllLobbies() []domain.Lobby {
 	var lobbies []domain.Lobby
 
 	for _, lobby := range srvc.lobbies {
@@ -47,7 +47,7 @@ func (srvc *Service) GetAllLobbies() []domain.Lobby {
 	return lobbies
 }
 
-func (srvc *Service) GetLobby(lobbyID uuid.UUID) (domain.Lobby, error) {
+func (srvc *LobbyService) GetLobby(lobbyID uuid.UUID) (domain.Lobby, error) {
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
 		return domain.Lobby{}, errors.New("Lobby doesn't exist!")
 	}
@@ -55,7 +55,7 @@ func (srvc *Service) GetLobby(lobbyID uuid.UUID) (domain.Lobby, error) {
 	return *srvc.lobbies[lobbyID], nil
 }
 
-func (srvc *Service) CloseLobby(lobbyID uuid.UUID) error {
+func (srvc *LobbyService) CloseLobby(lobbyID uuid.UUID) error {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return errors.New("lobby doesn't exist!")
