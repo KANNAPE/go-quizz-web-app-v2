@@ -1,45 +1,63 @@
 package httpx
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
 func (h *Handler) GetLobbyMessages(writer http.ResponseWriter, req *http.Request) {
-	// messages := h.Lobby.()
+	lobbyID, err := getUUIDFromUri(req, "lobby_id")
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	// if err := json.NewEncoder(writer).Encode(messages); err != nil {
-	// 	panic(err)
-	// }
+	messages, err := h.Lobby.GetAllMessagesInLobby(lobbyID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(writer).Encode(messages); err != nil {
+		panic(err)
+	}
 }
 
 func (h *Handler) GetMessage(writer http.ResponseWriter, req *http.Request) {
-	// messageID, err := getUUIDFromUri(req, "id")
-	// if err != nil {
-	// 	writer.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
+	lobbyID, err := getUUIDFromUri(req, "lobby_id")
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	// message, err := h.Message.Get(messageID)
-	// if err != nil {
-	// 	writer.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
+	messageID, err := getUUIDFromUri(req, "message_id")
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	// if err := json.NewEncoder(writer).Encode(message); err != nil {
-	// 	panic(err)
-	// }
+	message, err := h.Lobby.GetLobbyMessage(lobbyID, messageID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(writer).Encode(message); err != nil {
+		panic(err)
+	}
 }
 
 type PostMessageRequest struct {
-	Body string `json:"content" validate:"required"`
+	Body     string `json:"content" validate:"required"`
+	SenderID string `json:"sender_id" validate:"required"`
 }
 
 func (h *Handler) PostMessage(writer http.ResponseWriter, req *http.Request) {
-	// var messageReq PostMessageRequest
-	// if err := json.NewDecoder(req.Body).Decode(&messageReq); err != nil {
-	// 	writer.WriteHeader(http.StatusUnprocessableEntity)
-	// 	return
-	// }
+	var messageReq PostMessageRequest
+	if err := json.NewDecoder(req.Body).Decode(&messageReq); err != nil {
+		writer.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 
 	// message_id, err := h.Message.Create(messageReq.Body)
 	// if err != nil {
