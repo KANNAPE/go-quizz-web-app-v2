@@ -3,6 +3,8 @@ package lobby
 import (
 	"errors"
 	"go-quizz/m/internal/core/domain"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -17,7 +19,7 @@ func (srvc *LobbyService) GetAllMessagesInLobby(lobbyID uuid.UUID) ([]domain.Mes
 	for _, message := range lobby.Messages {
 		messageCopy := domain.Message{
 			ID:       message.ID,
-			Sender:   message.Sender,
+			SenderID: message.SenderID,
 			TimeSent: message.TimeSent,
 			Body:     message.Body,
 		}
@@ -42,12 +44,26 @@ func (srvc *LobbyService) GetLobbyMessage(lobbyID uuid.UUID, messageID uuid.UUID
 	return *message, nil
 }
 
-func (srvc *LobbyService) CreateMessage(senderID uuid.UUID, body string) (uuid.UUID, error) {
-	// check que le client existe dans le lobby
+func (srvc *LobbyService) CreateMessage(lobbyID uuid.UUID, senderID uuid.UUID, body string) (uuid.UUID, error) {
+	lobby, ok := srvc.lobbies[lobbyID]
+	if !ok {
+		return uuid.Nil, errors.New("lobby doesn't exist")
+	}
 
-	// check que le body est pas empty (on veut pas de messages vides)
+	if _, ok := lobby.Clients[senderID]; !ok {
+		return uuid.Nil, errors.New("client doesn't exist or is not in this lobby")
+	}
 
-	// créer le message et le rajouter dans le tableau
+	if strings.Trim(body, "") == "" {
+		return uuid.Nil, errors.New("body is empty")
+	}
 
-	// renvoyer l'ID du message nouvellement créé
+	messageID := uuid.New()
+	timeSent := time.Now()
+
+	message := domain.NewMessage(messageID, timeSent, body)
+
+	lobby.Messages[messageID] = message
+
+	return messageID, nil
 }

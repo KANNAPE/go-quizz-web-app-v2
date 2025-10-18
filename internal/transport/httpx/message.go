@@ -3,6 +3,8 @@ package httpx
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func (h *Handler) GetLobbyMessages(writer http.ResponseWriter, req *http.Request) {
@@ -59,13 +61,25 @@ func (h *Handler) PostMessage(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// message_id, err := h.Message.Create(messageReq.Body)
-	// if err != nil {
-	// 	writer.WriteHeader(http.StatusUnprocessableEntity)
-	// 	return
-	// }
+	lobbyID, err := getUUIDFromUri(req, "lobby_id")
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	// if err := json.NewEncoder(writer).Encode(message_id); err != nil {
-	// 	panic(err)
-	// }
+	senderID, err := uuid.Parse(messageReq.SenderID)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	messageID, err := h.Lobby.CreateMessage(lobbyID, senderID, messageReq.Body)
+	if err != nil {
+		writer.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	if err := json.NewEncoder(writer).Encode(messageID); err != nil {
+		panic(err)
+	}
 }

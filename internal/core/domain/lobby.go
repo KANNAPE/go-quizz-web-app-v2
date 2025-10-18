@@ -17,6 +17,6 @@ var LobbyMaxClientCapacity int = 8
 func NewLobby(lobbyID uuid.UUID) *Lobby {
 	return &Lobby{
 		ID:      lobbyID,
-		Clients: make(map[uuid.UUID]*Client, LobbyMaxClientCapacity),
+		Clients: make(map[uuid.UUID]*Client),
 	}
 }
