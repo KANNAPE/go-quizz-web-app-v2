@@ -48,16 +48,16 @@ func (srvc *LobbyService) GetClientInLobby(lobbyID uuid.UUID, clientID uuid.UUID
 	return clientCopy, nil
 }
 
-func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (domain.Lobby, error) {
+func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (domain.Client, error) {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
-		return domain.Lobby{}, errors.New("lobby doesn't exists")
+		return domain.Client{}, errors.New("lobby doesn't exists")
 	}
 	if len(lobby.Clients) == domain.LobbyMaxClientCapacity {
-		return domain.Lobby{}, errors.New("lobby is already full")
+		return domain.Client{}, errors.New("lobby is already full")
 	}
-	if strings.Trim(username, "") == "" {
-		return domain.Lobby{}, errors.New("username is not valid")
+	if strings.TrimSpace(username) == "" {
+		return domain.Client{}, errors.New("username is not valid")
 	}
 
 	clientID := uuid.New()
@@ -69,7 +69,7 @@ func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (do
 		lobby.HostID = client.ID
 	}
 
-	return *lobby, nil
+	return *client, nil
 }
 
 func (srvc *LobbyService) DisconnectsClient(lobbyID uuid.UUID, client domain.Client) (domain.Lobby, error) {

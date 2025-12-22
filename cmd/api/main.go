@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"go-quizz/m/internal/core/services/lobby"
-	"go-quizz/m/internal/transport/httpx"
+	"go-quizz/m/internal/transport/httpx/handlers"
 )
 
 func main() {
 	lobbySrvc := lobby.NewService()
 
-	handler := httpx.NewHandler(lobbySrvc)
+	handler := handlers.NewHandler(lobbySrvc)
 
 	fmt.Println("Listening on localhost:8080...")
 	http.ListenAndServe(":8080", handler.Router)

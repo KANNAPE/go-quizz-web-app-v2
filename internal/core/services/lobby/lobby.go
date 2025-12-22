@@ -2,7 +2,6 @@ package lobby
 
 import (
 	"errors"
-	"fmt"
 	"go-quizz/m/internal/core/domain"
 
 	"github.com/google/uuid"
@@ -18,16 +17,15 @@ func NewService() *LobbyService {
 	}
 }
 
-func (srvc *LobbyService) OpenLobby() uuid.UUID {
+func (srvc *LobbyService) OpenLobby() (uuid.UUID, error) {
 	newLobbyID := uuid.New()
 	if _, ok := srvc.lobbies[newLobbyID]; !ok {
 		srvc.lobbies[newLobbyID] = domain.NewLobby(newLobbyID)
 	} else {
-		//TODO: handle error, lobby ID already exists
-		fmt.Println("lobby already exists!")
+		return uuid.UUID{}, errors.New("lobby already exists!")
 	}
 
-	return newLobbyID
+	return newLobbyID, nil
 }
 
 func (srvc *LobbyService) GetAllLobbies() []domain.Lobby {

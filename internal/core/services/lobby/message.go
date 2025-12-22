@@ -38,7 +38,7 @@ func (srvc *LobbyService) GetLobbyMessage(lobbyID uuid.UUID, messageID uuid.UUID
 
 	message, ok := lobby.Messages[messageID]
 	if !ok {
-		return domain.Message{}, errors.New("invalid message ID")
+		return domain.Message{}, errors.New("message wasn't found")
 	}
 
 	return *message, nil
@@ -54,14 +54,14 @@ func (srvc *LobbyService) CreateMessage(lobbyID uuid.UUID, senderID uuid.UUID, b
 		return uuid.Nil, errors.New("client doesn't exist or is not in this lobby")
 	}
 
-	if strings.Trim(body, "") == "" {
+	if strings.TrimSpace(body) == "" {
 		return uuid.Nil, errors.New("body is empty")
 	}
 
 	messageID := uuid.New()
 	timeSent := time.Now()
 
-	message := domain.NewMessage(messageID, timeSent, body)
+	message := domain.NewMessage(messageID, senderID, timeSent, body)
 
 	lobby.Messages[messageID] = message
 

@@ -1,8 +1,10 @@
-package httpx
+package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"go-quizz/m/internal/core/services/lobby"
+	"go-quizz/m/internal/transport/httpx/dto"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -58,4 +60,10 @@ func getUUIDFromUri(req *http.Request, uriID string) (uuid.UUID, error) {
 	}
 
 	return ID, nil
+}
+
+func encodeResponse[T any](writer http.ResponseWriter, response dto.APIResponse[T]) error {
+	writer.WriteHeader(response.Code)
+
+	return json.NewEncoder(writer).Encode(response)
 }

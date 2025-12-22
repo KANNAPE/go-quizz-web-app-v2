@@ -7,15 +7,16 @@ import (
 )
 
 type Message struct {
-	ID       uuid.UUID `json:"id"`
-	SenderID uuid.UUID `json:"sender_id"`
-	TimeSent time.Time `json:"time_sent"`
-	Body     string    `json:"content"`
+	ID       uuid.UUID
+	SenderID uuid.UUID
+	TimeSent time.Time
+	Body     string
 }
 
-func NewMessage(id uuid.UUID, timeSent time.Time, body string) *Message {
+func NewMessage(messageID uuid.UUID, senderID uuid.UUID, timeSent time.Time, body string) *Message {
 	return &Message{
-		ID:       id,
+		ID:       messageID,
+		SenderID: senderID,
 		TimeSent: timeSent,
 		Body:     body,
 	}

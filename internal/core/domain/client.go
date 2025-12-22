@@ -3,8 +3,8 @@ package domain
 import "github.com/google/uuid"
 
 type Client struct {
-	ID       uuid.UUID `json:"id"`
-	Username string    `json:"username"`
+	ID       uuid.UUID
+	Username string
 }
 
 func NewClient(id uuid.UUID, username string) *Client {
