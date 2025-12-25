@@ -10,7 +10,7 @@ import (
 
 func (srvc *LobbyService) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client, error) {
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
-		return nil, errors.New("Lobby doesn't exists!")
+		return nil, errors.New("Lobby doesn't exist!")
 	}
 
 	lobby := srvc.lobbies[lobbyID]
@@ -30,7 +30,7 @@ func (srvc *LobbyService) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client,
 
 func (srvc *LobbyService) GetClientInLobby(lobbyID uuid.UUID, clientID uuid.UUID) (domain.Client, error) {
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
-		return domain.Client{}, errors.New("Lobby doesn't exists!")
+		return domain.Client{}, errors.New("Lobby doesn't exist!")
 	}
 
 	lobby := srvc.lobbies[lobbyID]
@@ -51,7 +51,7 @@ func (srvc *LobbyService) GetClientInLobby(lobbyID uuid.UUID, clientID uuid.UUID
 func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (domain.Client, error) {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
-		return domain.Client{}, errors.New("lobby doesn't exists")
+		return domain.Client{}, errors.New("lobby doesn't exist")
 	}
 	if len(lobby.Clients) == domain.LobbyMaxClientCapacity {
 		return domain.Client{}, errors.New("lobby is already full")
@@ -75,7 +75,7 @@ func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (do
 func (srvc *LobbyService) DisconnectsClient(lobbyID uuid.UUID, client domain.Client) (domain.Lobby, error) {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
-		return domain.Lobby{}, errors.New("lobby doesn't exists")
+		return domain.Lobby{}, errors.New("lobby doesn't exist")
 	}
 	if len(lobby.Clients) == 0 {
 		return domain.Lobby{}, errors.New("lobby is already empty")
