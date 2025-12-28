@@ -3,11 +3,13 @@ package lobby
 import (
 	"errors"
 	"go-quizz/m/internal/core/domain"
+	"sync"
 
 	"github.com/google/uuid"
 )
 
 type LobbyService struct {
+	mu      sync.RWMutex
 	lobbies map[uuid.UUID]*domain.Lobby
 }
 
@@ -18,6 +20,9 @@ func NewService() *LobbyService {
 }
 
 func (srvc *LobbyService) OpenLobby() (uuid.UUID, error) {
+	srvc.mu.Lock()
+	defer srvc.mu.Unlock()
+
 	newLobbyID := uuid.New()
 	if _, ok := srvc.lobbies[newLobbyID]; !ok {
 		srvc.lobbies[newLobbyID] = domain.NewLobby(newLobbyID)
@@ -29,6 +34,9 @@ func (srvc *LobbyService) OpenLobby() (uuid.UUID, error) {
 }
 
 func (srvc *LobbyService) GetAllLobbies() []domain.Lobby {
+	srvc.mu.RLock()
+	defer srvc.mu.RUnlock()
+
 	var lobbies []domain.Lobby
 
 	for _, lobby := range srvc.lobbies {
@@ -46,6 +54,9 @@ func (srvc *LobbyService) GetAllLobbies() []domain.Lobby {
 }
 
 func (srvc *LobbyService) GetLobby(lobbyID uuid.UUID) (domain.Lobby, error) {
+	srvc.mu.RLock()
+	defer srvc.mu.RUnlock()
+
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
 		return domain.Lobby{}, errors.New("Lobby doesn't exist!")
 	}
@@ -54,6 +65,13 @@ func (srvc *LobbyService) GetLobby(lobbyID uuid.UUID) (domain.Lobby, error) {
 }
 
 func (srvc *LobbyService) CloseLobby(lobbyID uuid.UUID) error {
+	srvc.mu.Lock()
+	defer srvc.mu.Unlock()
+
+	return srvc.closeLobby(lobbyID)
+}
+
+func (srvc *LobbyService) closeLobby(lobbyID uuid.UUID) error {
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return errors.New("lobby doesn't exist!")

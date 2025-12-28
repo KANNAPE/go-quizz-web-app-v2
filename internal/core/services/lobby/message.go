@@ -10,6 +10,9 @@ import (
 )
 
 func (srvc *LobbyService) GetAllMessagesInLobby(lobbyID uuid.UUID) ([]domain.Message, error) {
+	srvc.mu.RLock()
+	defer srvc.mu.RUnlock()
+
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return nil, errors.New("lobby doesn't exist")
@@ -31,6 +34,9 @@ func (srvc *LobbyService) GetAllMessagesInLobby(lobbyID uuid.UUID) ([]domain.Mes
 }
 
 func (srvc *LobbyService) GetLobbyMessage(lobbyID uuid.UUID, messageID uuid.UUID) (domain.Message, error) {
+	srvc.mu.RLock()
+	defer srvc.mu.RUnlock()
+
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return domain.Message{}, errors.New("lobby doesn't exist")
@@ -45,6 +51,9 @@ func (srvc *LobbyService) GetLobbyMessage(lobbyID uuid.UUID, messageID uuid.UUID
 }
 
 func (srvc *LobbyService) CreateMessage(lobbyID uuid.UUID, senderID uuid.UUID, body string) (uuid.UUID, error) {
+	srvc.mu.Lock()
+	defer srvc.mu.Unlock()
+
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
 		return uuid.Nil, errors.New("lobby doesn't exist")

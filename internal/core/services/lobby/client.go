@@ -9,8 +9,11 @@ import (
 )
 
 func (srvc *LobbyService) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client, error) {
+	srvc.mu.RLock()
+	defer srvc.mu.RUnlock()
+
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
-		return nil, errors.New("Lobby doesn't exist!")
+		return nil, errors.New("Lobby doesn't exists!")
 	}
 
 	lobby := srvc.lobbies[lobbyID]
@@ -29,8 +32,11 @@ func (srvc *LobbyService) GetClientsInLobby(lobbyID uuid.UUID) ([]domain.Client,
 }
 
 func (srvc *LobbyService) GetClientInLobby(lobbyID uuid.UUID, clientID uuid.UUID) (domain.Client, error) {
+	srvc.mu.RLock()
+	defer srvc.mu.RUnlock()
+
 	if _, ok := srvc.lobbies[lobbyID]; !ok {
-		return domain.Client{}, errors.New("Lobby doesn't exist!")
+		return domain.Client{}, errors.New("Lobby doesn't exists!")
 	}
 
 	lobby := srvc.lobbies[lobbyID]
@@ -49,9 +55,12 @@ func (srvc *LobbyService) GetClientInLobby(lobbyID uuid.UUID, clientID uuid.UUID
 }
 
 func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (domain.Client, error) {
+	srvc.mu.Lock()
+	defer srvc.mu.Unlock()
+
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
-		return domain.Client{}, errors.New("lobby doesn't exist")
+		return domain.Client{}, errors.New("lobby doesn't exists")
 	}
 	if len(lobby.Clients) == domain.LobbyMaxClientCapacity {
 		return domain.Client{}, errors.New("lobby is already full")
@@ -73,9 +82,12 @@ func (srvc *LobbyService) ConnectsClient(lobbyID uuid.UUID, username string) (do
 }
 
 func (srvc *LobbyService) DisconnectsClient(lobbyID uuid.UUID, client domain.Client) (domain.Lobby, error) {
+	srvc.mu.Lock()
+	defer srvc.mu.Unlock()
+
 	lobby, ok := srvc.lobbies[lobbyID]
 	if !ok {
-		return domain.Lobby{}, errors.New("lobby doesn't exist")
+		return domain.Lobby{}, errors.New("lobby doesn't exists")
 	}
 	if len(lobby.Clients) == 0 {
 		return domain.Lobby{}, errors.New("lobby is already empty")
@@ -87,7 +99,7 @@ func (srvc *LobbyService) DisconnectsClient(lobbyID uuid.UUID, client domain.Cli
 	delete(lobby.Clients, client.ID)
 
 	if lobby.HostID == client.ID {
-		if err := srvc.CloseLobby(lobbyID); err != nil {
+		if err := srvc.closeLobby(lobbyID); err != nil {
 			return domain.Lobby{}, errors.New("could not close lobby")
 		}
 
