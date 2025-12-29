@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ block "title" . }}App{{ end }}</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="static/style.css" />
 </head>
+
 <body>
     <header>
         <nav>
@@ -21,5 +23,8 @@
     <footer>
         <p>© 2025 <a href="https://github.com/kannape">KANNAPÉ</a></p>
     </footer>
+
+    {{ block "scripts" . }}{{ end }}
 </body>
+
 </html>

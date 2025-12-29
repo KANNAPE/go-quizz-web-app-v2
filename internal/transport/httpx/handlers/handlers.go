@@ -4,21 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"go-quizz/m/internal/core/services/lobby"
+	middlewares "go-quizz/m/internal/transport/httpx"
 	"go-quizz/m/internal/transport/httpx/dto"
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 )
 
 type Handler struct {
-	Router *mux.Router
+	Router *http.ServeMux
 	Lobby  *lobby.LobbyService
 }
 
 func NewHandler(lobby *lobby.LobbyService) *Handler {
 	handler := &Handler{
-		Router: mux.NewRouter(),
+		Router: http.NewServeMux(),
 		Lobby:  lobby,
 	}
 
@@ -28,28 +28,31 @@ func NewHandler(lobby *lobby.LobbyService) *Handler {
 	return handler
 }
 
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Apply middleware to the router
+	middlewares.CORSMiddleware(h.Router).ServeHTTP(w, r)
+}
+
 func (h *Handler) MapRoutes() {
 	// Lobby
-	h.Router.HandleFunc("/api/lobbies", h.GetAllLobbies).Methods("GET")
-	h.Router.HandleFunc("/api/lobby", h.PostLobby).Methods("POST")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}", h.GetLobby).Methods("GET")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}", h.DeleteLobby).Methods("DELETE")
+	h.Router.HandleFunc("GET /api/lobbies", h.GetAllLobbies)
+	h.Router.HandleFunc("POST /api/lobby", h.PostLobby)
+	h.Router.HandleFunc("GET /api/lobby/{lobby_id}", h.GetLobby)
+	h.Router.HandleFunc("DELETE /api/lobby/{lobby_id}", h.DeleteLobby)
 
 	// Client
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/clients", h.GetLobbyClients).Methods("GET")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/connect", h.LobbyClientConnects).Methods("POST")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/disconnect/{client_id}", h.LobbyClientDisconnects).Methods("DELETE")
+	h.Router.HandleFunc("GET /api/lobby/{lobby_id}/clients", h.GetLobbyClients)
+	h.Router.HandleFunc("POST /api/lobby/{lobby_id}/connect", h.LobbyClientConnects)
+	h.Router.HandleFunc("DELETE /api/lobby/{lobby_id}/disconnect/{client_id}", h.LobbyClientDisconnects)
 
 	// Message
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/messages", h.GetLobbyMessages).Methods("GET")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/message", h.PostMessage).Methods("POST")
-	h.Router.HandleFunc("/api/lobby/{lobby_id}/message/{message_id}", h.GetMessage).Methods("GET")
+	h.Router.HandleFunc("GET /api/lobby/{lobby_id}/messages", h.GetLobbyMessages)
+	h.Router.HandleFunc("POST /api/lobby/{lobby_id}/message", h.PostMessage)
+	h.Router.HandleFunc("GET /api/lobby/{lobby_id}/message/{message_id}", h.GetMessage)
 }
 
 func getUUIDFromUri(req *http.Request, uriID string) (uuid.UUID, error) {
-	vars := mux.Vars(req)
-
-	stringID := vars[uriID]
+	stringID := req.PathValue(uriID)
 	if stringID == "" {
 		return uuid.Nil, errors.New("invalid uri ID")
 	}
@@ -64,6 +67,5 @@ func getUUIDFromUri(req *http.Request, uriID string) (uuid.UUID, error) {
 
 func encodeResponse[T any](writer http.ResponseWriter, response dto.APIResponse[T]) error {
 	writer.WriteHeader(response.Code)
-
 	return json.NewEncoder(writer).Encode(response)
 }

@@ -14,7 +14,7 @@ func main() {
 	handler := handlers.NewHandler(lobbySrvc)
 
 	fmt.Println("Listening on localhost:8080...")
-	http.ListenAndServe(":8080", handler.Router)
+	http.ListenAndServe(":8080", handler)
 
 	// https://github.com/TutorialEdge/go-rest-api-course
 }
