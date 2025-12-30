@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	"go-quizz/m/internal/transport/httpx/dto"
+	"go-quizz/m/internal/transport/api/dto"
 	"net/http"
 )
 

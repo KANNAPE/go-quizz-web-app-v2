@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"go-quizz/m/internal/transport/httpx/dto"
+	"go-quizz/m/internal/transport/api/dto"
 	"net/http"
 
 	"github.com/google/uuid"

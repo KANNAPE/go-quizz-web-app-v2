@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"go-quizz/m/internal/core/services/lobby"
-	"go-quizz/m/internal/transport/httpx/handlers"
+	"go-quizz/m/internal/transport/api/handlers"
 )
 
 func main() {

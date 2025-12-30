@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"go-quizz/m/internal/core/services/lobby"
-	middlewares "go-quizz/m/internal/transport/httpx"
-	"go-quizz/m/internal/transport/httpx/dto"
+	"go-quizz/m/internal/transport/api/dto"
+	"go-quizz/m/internal/transport/api/middlewares"
 	"net/http"
 
 	"github.com/google/uuid"

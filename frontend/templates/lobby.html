@@ -1,11 +1,9 @@
 {{ define "title" }}App · Lobby{{ end }}
 
 {{ define "content" }}
-<h1>Welcome, {{ .Host.Username }}!</h1>
-<code>{{ .Lobby.ID }}</code>
+<h1>Welcome, {{ .Username }}!</h1>
+<code>{{ .LobbyID }}</code>
 <br>
-<p>Copy this link to invite friends:</p>
-<p>{{ .JoinURL }}</p>
 
 <hr>
 
@@ -16,33 +14,33 @@
     <button>Send</button>
 </form>
 <script>
-    const wsScheme = location.protocol === "https:" ? "wss" : "ws";
-    const wsUrl = wsScheme + "://" + location.host + location.pathname;
-    const ws = new WebSocket(wsUrl);
+    // const wsScheme = location.protocol === "https:" ? "wss" : "ws";
+    // const wsUrl = wsScheme + "://" + location.host + location.pathname;
+    // const ws = new WebSocket(wsUrl);
 
-    ws.onmessage = (e) => {
-        const msg = JSON.parse(e.data);
-        const box = document.getElementById("chat-box");
-        const div = document.createElement("div");
-        const sender = document.createElement("u");
+    // ws.onmessage = (e) => {
+    //     const msg = JSON.parse(e.data);
+    //     const box = document.getElementById("chat-box");
+    //     const div = document.createElement("div");
+    //     const sender = document.createElement("u");
 
-        sender.textContent = msg.username + ":";
-        div.appendChild(sender);
+    //     sender.textContent = msg.username + ":";
+    //     div.appendChild(sender);
 
-        div.textContent = " " + msg.text;
-        box.appendChild(div);
+    //     div.textContent = " " + msg.text;
+    //     box.appendChild(div);
 
-        box.scrollTop = box.scrollHeight;
-    };
+    //     box.scrollTop = box.scrollHeight;
+    // };
 
-    document.getElementById("chat-form").onsubmit = (e) => {
-        e.preventDefault();
+    // document.getElementById("chat-form").onsubmit = (e) => {
+    //     e.preventDefault();
 
-        const input = document.getElementById("chat-input");
-        if (input.value.trim() !== "") {
-            ws.send(input.value);
-            input.value = "";
-        }
-    };
+    //     const input = document.getElementById("chat-input");
+    //     if (input.value.trim() !== "") {
+    //         ws.send(input.value);
+    //         input.value = "";
+    //     }
+    // };
 </script>
 {{ end }}
