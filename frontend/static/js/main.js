@@ -14,41 +14,41 @@ function createLobby(event) {
                 var lobbyId = response.data.created_lobby_id
                 console.log(lobbyId);
 
-                joinLobby(lobbyId);
+                joinLobby();
             } else {
                 console.log(response.message);
             }
         };
-
-        xhttp.open("POST", "http://localhost:8080/api/lobby", true);
-        xhttp.send();
     }
 
-    function joinLobby(lobbyId) {
-        var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "http://localhost:8080/api/lobby", true);
+    xhttp.send();
+}
 
-        const formData = new FormData(Form);
-        const username = formData.get("username");
+function joinLobby() {
+    var xhttp = new XMLHttpRequest();
 
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == XMLHttpRequest.DONE) {
-                var response = JSON.parse(this.responseText);
+    const formData = new FormData(Form);
+    const username = formData.get("username");
 
-                if (this.status == 200) {
-                    Form.submit();
-                } else {
-                    console.log(response.message);
-                }
-            };
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == XMLHttpRequest.DONE) {
+            var response = JSON.parse(this.responseText);
 
-            xhttp.open("POST", "http://localhost:8080/api/lobby/" + lobbyId + "/connect", true);
-            xhttp.setRequestHeader("Content-Type", "application/json");
-
-            xhttp.send(JSON.stringify({
-                username: username,
-            }));
-        }
+            if (this.status == 200) {
+                Form.submit();
+            } else {
+                console.log(response.message);
+            }
+        };
     }
+
+    xhttp.open("POST", "http://localhost:8080/api/lobby/" + lobbyId + "/connect", true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+
+    xhttp.send(JSON.stringify({
+        username: username,
+    }));
 }
 
 Form.addEventListener("submit", createLobby);
