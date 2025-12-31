@@ -1,54 +1,39 @@
 var Form = document.getElementById("create-lobby-form");
 
-function createLobby(event) {
+async function createLobby(event) {
     event.preventDefault();
 
-    // making a request to create the lobby
-    var xhttp = new XMLHttpRequest();
+    // making a request to the server to create the lobby
+    const lobbyCreationResponse = await fetch("http://localhost:8080/api/lobby", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then((response) => response.json());
 
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == XMLHttpRequest.DONE) {
-            var response = JSON.parse(this.responseText);
-
-            if (this.status == 200) {
-                var lobbyId = response.data.created_lobby_id
-                console.log(lobbyId);
-
-                joinLobby();
-            } else {
-                console.log(response.message);
-            }
-        };
+    if (lobbyCreationResponse.code !== 200) {
+        alert(lobbyCreationResponse.message);
+        return;
     }
 
-    xhttp.open("POST", "http://localhost:8080/api/lobby", true);
-    xhttp.send();
-}
+    const joinLobbyResponse = await fetch("http://localhost:8080/api/lobby/" + lobbyCreationResponse.data.created_lobby_id + "/connect", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: Form.username.value,
+        }),
+    }).then((response) => response.json());
 
-function joinLobby() {
-    var xhttp = new XMLHttpRequest();
-
-    const formData = new FormData(Form);
-    const username = formData.get("username");
-
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == XMLHttpRequest.DONE) {
-            var response = JSON.parse(this.responseText);
-
-            if (this.status == 200) {
-                Form.submit();
-            } else {
-                console.log(response.message);
-            }
-        };
+    if (joinLobbyResponse.code !== 200) {
+        alert("error joining the lobby!");
+        return;
     }
 
-    xhttp.open("POST", "http://localhost:8080/api/lobby/" + lobbyId + "/connect", true);
-    xhttp.setRequestHeader("Content-Type", "application/json");
+    localStorage.setItem("lobby_id", lobbyCreationResponse.data.created_lobby_id);
 
-    xhttp.send(JSON.stringify({
-        username: username,
-    }));
+    Form.submit(); // to get to lobby with the POST method
 }
 
 Form.addEventListener("submit", createLobby);
