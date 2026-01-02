@@ -1,4 +1,5 @@
-var Form = document.getElementById("create-lobby-form");
+var createLobbyForm = document.getElementById("create-lobby-form");
+var joinLobbyForm = document.getElementById("join-lobby-form");
 
 async function createLobby(event) {
     event.preventDefault();
@@ -22,7 +23,7 @@ async function createLobby(event) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            username: Form.username.value,
+            username: createLobbyForm.username.value,
         }),
     }).then((response) => response.json());
 
@@ -31,9 +32,43 @@ async function createLobby(event) {
         return;
     }
 
-    localStorage.setItem("lobby_id", lobbyCreationResponse.data.created_lobby_id);
+    localStorage.setItem("lobby_id", joinLobbyResponse.data.lobby_id);
+    localStorage.setItem("client_id", joinLobbyResponse.data.client_id);
 
-    Form.submit(); // to get to lobby with the POST method
+    createLobbyForm.submit(); // to get to lobby with the POST method
 }
 
-Form.addEventListener("submit", createLobby);
+async function joinLobby(event) {
+    event.preventDefault();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const lobbyId = urlParams.get("id");
+
+    if (lobbyId === null) {
+        window.location.href = "/";
+        return;
+    }
+
+    const joinLobbyResponse = await fetch("http://localhost:8080/api/lobby/" + lobbyId + "/connect", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: joinLobbyForm.username.value,
+        }),
+    }).then((response) => response.json());
+
+    if (joinLobbyResponse.code !== 200) {
+        alert("error joining the lobby!");
+        return;
+    }
+
+    localStorage.setItem("lobby_id", joinLobbyResponse.data.lobby_id);
+    localStorage.setItem("client_id", joinLobbyResponse.data.client_id);
+
+    joinLobbyForm.submit(); // to get to lobby with the POST method
+}
+
+joinLobbyForm?.addEventListener("submit", joinLobby);
+createLobbyForm?.addEventListener("submit", createLobby);

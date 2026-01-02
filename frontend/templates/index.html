@@ -2,12 +2,20 @@
 
 {{ define "content" }}
 <h1>Welcome!</h1>
-<p>Enter a username to create a lobby:</p>
+<p>Enter a username to {{ if .JoinLobby }}join{{ else }}create{{ end }} a lobby:</p>
 
-<form id="create-lobby-form" action="/lobby" method="POST">
-  <input type="text" name="username" placeholder="Enter username" required />
-  <button type="submit">Create lobby</button>
+{{ if .JoinLobby }}
+<form id="join-lobby-form" action="/lobby" method="POST">
+	<input type="text" name="username" placeholder="Enter username" required />
+	<button type="submit">Join lobby</button>
 </form>
+{{ else }}
+<form id="create-lobby-form" action="/lobby" method="POST">
+	<input type="text" name="username" placeholder="Enter username" required />
+	<button type="submit">Create lobby</button>
+</form>
+{{ end }}
+
 {{ end }}
 
 {{ define "scripts" }}

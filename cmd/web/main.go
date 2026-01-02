@@ -20,8 +20,10 @@ func main() {
 	fs := http.FileServer(http.FS(staticSub))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	http.HandleFunc("/", handler.HomePage)
-	http.HandleFunc("POST /lobby", handler.LobbyPage)
+	http.HandleFunc("/", handler.CreateLobbyPage)
+	http.HandleFunc("GET /lobby", handler.JoinLobbyPage)
+	http.HandleFunc("POST /lobby", handler.InLobbyPage)
+	http.HandleFunc("/lobby/ws", handler.InLobbyWebsocketConnection)
 
 	fmt.Println("Listening on localhost:8443")
 	http.ListenAndServe(":8443", nil)
