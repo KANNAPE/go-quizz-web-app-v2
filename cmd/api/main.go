@@ -11,7 +11,7 @@ import (
 
 func main() {
 	lobbySrvc := lobby.NewService()
-	hubMgr := websocket.NewHubManager()
+	hubMgr := websocket.NewHubManager(lobbySrvc)
 
 	handler := handlers.NewHandler(lobbySrvc, hubMgr)
 
