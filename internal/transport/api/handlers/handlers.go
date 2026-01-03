@@ -6,6 +6,7 @@ import (
 	"go-quizz/m/internal/core/services/lobby"
 	"go-quizz/m/internal/transport/api/dto"
 	"go-quizz/m/internal/transport/api/middlewares"
+	"go-quizz/m/internal/transport/websocket"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -14,12 +15,14 @@ import (
 type Handler struct {
 	Router *http.ServeMux
 	Lobby  *lobby.LobbyService
+	HubMgr *websocket.HubManager
 }
 
-func NewHandler(lobby *lobby.LobbyService) *Handler {
+func NewHandler(lobby *lobby.LobbyService, hubMgr *websocket.HubManager) *Handler {
 	handler := &Handler{
 		Router: http.NewServeMux(),
 		Lobby:  lobby,
+		HubMgr: hubMgr,
 	}
 
 	// routes
@@ -49,6 +52,9 @@ func (h *Handler) MapRoutes() {
 	h.Router.HandleFunc("GET /api/lobby/{lobby_id}/messages", h.GetLobbyMessages)
 	h.Router.HandleFunc("POST /api/lobby/{lobby_id}/message", h.PostMessage)
 	h.Router.HandleFunc("GET /api/lobby/{lobby_id}/message/{message_id}", h.GetMessage)
+
+	// Websocket
+	h.Router.HandleFunc("GET /api/lobby/{lobby_id}/ws", h.ServeWebSocket)
 }
 
 func getUUIDFromUri(req *http.Request, uriID string) (uuid.UUID, error) {

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -11,6 +12,10 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 }
+
+var clients = make(map[*websocket.Conn]bool)
+var broadcast = make(chan []byte)
+var mutex = &sync.Mutex{}
 
 func (h *Handler) InLobbyPage(writer http.ResponseWriter, request *http.Request) {
 	username := request.FormValue("username")

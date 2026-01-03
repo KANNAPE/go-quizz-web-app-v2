@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"go-quizz/m/frontend"
-	"go-quizz/m/internal/transport/web/handlers"
+	"go-quizz/m/internal/transport/httpx/handlers"
 )
 
 func main() {

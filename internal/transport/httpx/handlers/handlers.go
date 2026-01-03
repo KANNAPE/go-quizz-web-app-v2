@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"go-quizz/m/internal/transport/web"
+	"go-quizz/m/internal/transport/httpx"
 	"html/template"
 	"net/http"
 )
@@ -14,6 +14,6 @@ type Handler struct {
 func NewHandler() *Handler {
 	return &Handler{
 		Router:    http.NewServeMux(),
-		Templates: web.ParseTemplates(),
+		Templates: httpx.ParseTemplates(),
 	}
 }

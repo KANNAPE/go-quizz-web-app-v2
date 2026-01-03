@@ -1,5 +1,5 @@
 const wsScheme = location.protocol === "https:" ? "wss" : "ws";
-const wsUrl = wsScheme + "://" + location.host + location.pathname + "/ws";
+const wsUrl = wsScheme + "://localhost:8080/api/lobby/" + localStorage.getItem("lobby_id") + "/ws?client_id=" + localStorage.getItem("client_id");
 const ws = new WebSocket(wsUrl);
 
 const form = document.getElementById("chat");
